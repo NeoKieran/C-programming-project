@@ -1,0 +1,219 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+class Game {
+private:
+    std::vector<std::vector<char>> map;
+    int playerX, playerY;
+    const char PLAYER = 'P';
+    const char EMPTY = '.';
+    const char WALL = '#';
+    const char SCANNED = 'c';
+
+    void initializeMap() {
+        map = std::vector<std::vector<char>>(3, std::vector<char>(3, EMPTY));
+        playerX = 1;
+        playerY = 1;
+        map[playerY][playerX] = PLAYER;
+    }
+
+    void expandMap(char direction) {
+        switch (direction) {
+            case 'N': {
+                map.insert(map.begin(), std::vector<char>(map[0].size(), EMPTY));
+                playerY++;
+                break;
+            }
+            case 'S': {
+                map.push_back(std::vector<char>(map[0].size(), EMPTY));
+                break;
+            }
+            case 'W': {
+                for (auto& row : map) {
+                    row.insert(row.begin(), EMPTY);
+                }
+                playerX++;
+                break;
+            }
+            case 'E': {
+                for (auto& row : map) {
+                    row.push_back(EMPTY);
+                }
+                break;
+            }
+        }
+    }
+
+    bool isValidMove(int& newX, int& newY) {
+        if (newY < 0) {
+            expandMap('N');
+            newY = 0;
+            return true;
+        }
+        if (newY >= map.size()) {
+            expandMap('S');
+            newY = map.size() - 1;
+            return true;
+        }
+        if (newX < 0) {
+            expandMap('W');
+            newX = 0;
+            return true;
+        }
+        if (newX >= map[0].size()) {
+            expandMap('E');
+            newX = map[0].size() - 1;
+            return true;
+        }
+
+        return map[newY][newX] != WALL;
+    }
+
+    void clearScreen() {
+        std::cout << "\033[2J\033[1;1H";
+    }
+
+    void scan(int direction) {
+        if (direction < 1 || direction > 8) {
+            std::cout << "Invalid scan direction. Use 1-8.\n";
+            return;
+        }
+
+        int x = playerX;
+        int y = playerY;
+
+        switch(direction) {
+            case 1: // North
+                y = playerY - 1;
+                std::cout << "Scanning North...\n";
+                break;
+            case 2: // Northeast
+                y = playerY - 1;
+                x = playerX + 1;
+                std::cout << "Scanning Northeast...\n";
+                break;
+            case 3: // East
+                x = playerX + 1;
+                std::cout << "Scanning East...\n";
+                break;
+            case 4: // Southeast
+                y = playerY + 1;
+                x = playerX + 1;
+                std::cout << "Scanning Southeast...\n";
+                break;
+            case 5: // South
+                y = playerY + 1;
+                std::cout << "Scanning South...\n";
+                break;
+            case 6: // Southwest
+                y = playerY + 1;
+                x = playerX - 1;
+                std::cout << "Scanning Southwest...\n";
+                break;
+            case 7: // West
+                x = playerX - 1;
+                std::cout << "Scanning West...\n";
+                break;
+            case 8: // Northwest
+                y = playerY - 1;
+                x = playerX - 1;
+                std::cout << "Scanning Northwest...\n";
+                break;
+            default:
+                return;
+        }
+
+        if (y >= 0 && y < map.size() && x >= 0 && x < map[0].size()
+            && map[y][x] != WALL && map[y][x] != PLAYER) {
+            std::cout << "Scanned position (" << x << "," << y << ")\n";
+            map[y][x] = SCANNED;
+        } else {
+            std::cout << "Cannot scan position (" << x << "," << y << ") - out of bounds or blocked\n";
+        }
+    }
+
+public:
+    Game() {
+        initializeMap();
+    }
+
+    void displayMap() {
+        clearScreen();
+        std::cout << "Use WASD to move (then press Enter).\n";
+        std::cout << "Use 1-8 to scan in different directions:\n";
+        std::cout << "1:N  2:NE  3:E  4:SE  5:S  6:SW  7:W  8:NW\n";
+        std::cout << "Q to quit.\n\n";
+        std::cout << "Map size: " << map.size() << "x" << map[0].size() << "\n";
+        std::cout << "Player position: (" << playerX << "," << playerY << ")\n\n";
+
+        // Print column numbers
+        std::cout << "  ";  // Space for row numbers
+        for (size_t i = 0; i < map[0].size(); i++) {
+            std::cout << i;
+        }
+        std::cout << "\n";
+
+        // Print map content with row numbers
+        for (size_t i = 0; i < map.size(); i++) {
+            std::cout << i << " ";  // Row number with space
+            for (const char& cell : map[i]) {
+                std::cout << cell;
+            }
+            std::cout << "\n";
+        }
+    }
+
+    void movePlayer(char direction) {
+        int newX = playerX;
+        int newY = playerY;
+
+        switch (direction) {
+            case 'w': newY--; break;
+            case 's': newY++; break;
+            case 'a': newX--; break;
+            case 'd': newX++; break;
+            default: return;
+        }
+
+        if (isValidMove(newX, newY)) {
+            map[playerY][playerX] = EMPTY;
+            playerX = newX;
+            playerY = newY;
+            map[playerY][playerX] = PLAYER;
+        }
+    }
+
+    void run() {
+        char input;
+        bool running = true;
+
+        while (running) {
+            displayMap();
+            std::cout << "Enter move: ";
+            std::cin >> input;
+
+            if (input == 'q' || input == 'Q') {
+                running = false;
+            } else if (input >= '1' && input <= '8') {
+                scan(input - '0');
+            } else if (input == 'w' || input == 'W' ||
+                     input == 'a' || input == 'A' ||
+                     input == 's' || input == 'S' ||
+                     input == 'd' || input == 'D') {
+                movePlayer(tolower(input));
+            } else {
+                std::cout << "Invalid input! Please use WASD to move or 1-8 to scan.\n";
+                std::cout << "Press Enter to continue...";
+                std::cin.ignore(10000, '\n');
+                std::cin.get();
+            }
+        }
+    }
+};
+
+int main() {
+    Game game;
+    game.run();
+    return 0;
+}
