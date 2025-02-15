@@ -1,3 +1,5 @@
+//This ver works until pg 8 of 22
+
 #include <iostream>
 #include <fstream>
 #include <string>
