@@ -7,6 +7,9 @@
 #include <cstdlib>
 #include <iomanip>
 #include <vector>
+#include "SatComRelay.h"
+#include "FileUtil.h"  
+#include "ConfigSettings.h"  
 
 
 // Function prototypes
@@ -130,6 +133,7 @@ void configureSimulatorSettings(std::string& inputMapFilename, std::string& outp
         }
     } while (choice != 'e');
 }
+
 // Function to get current time in DD/MM/YY HH:MM:SS format
 std::string getCurrentTime() {
     std::time_t now = std::time(nullptr);
@@ -144,61 +148,24 @@ std::string getCurrentTime() {
     return oss.str();
 }
 
-// Function to generate a 21x11 terrain map
-std::vector<std::string> generateMap(int width, int height) {
-    std::vector<std::string> map(height, std::string(width, ' '));
-
-    // Set the border as barriers ('#')
-    for (int i = 0; i < width; i++) {
-        map[0][i] = '#';
-        map[height - 1][i] = '#';
-    }
-    for (int i = 0; i < height; i++) {
-        map[i][0] = '#';
-        map[i][width - 1] = '#';
-    }
-
-    // Ensure (0,0) is always '#'
-    map[0][0] = '#';
-
-    // Randomly assign terrain markers
-    char terrain[] = {'X', 'M', 'w', '~', 'h', 'j', 'f'};
-    int terrainSize = sizeof(terrain) / sizeof(terrain[0]);
-
-    for (int i = 1; i < height - 1; i++) {
-        for (int j = 1; j < width - 1; j++) {
-            map[i][j] = terrain[rand() % terrainSize];
-        }
-    }
-
-    // Place Start ('S') and End ('E') positions
-    map[3][14] = 'S';
-    map[3][3] = 'E';
-
-    return map;
-}
-
+// Start Autopilot Mapping Function
 void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, const std::string& outputFilename) {
     std::cout << "\n[ Start Autopilot Mapping ]\n";
     std::cout << "INPUT scenario file name    = \033[32m" << inputFilename << "\033[0m\n";
     std::cout << "INPUT scenario file encrypted = \033[32m" << (isEncrypted ? "Y" : "N") << "\033[0m\n";
     std::cout << "OUTPUT map report filename  = \033[32m" << outputFilename << "\033[0m\n\n";
 
-    // Ask if the user wants to display the report (validated input)
+    // Ask if the user wants to display the report
     char displayChoice;
     bool displayReport = false;
-    
     do {
         std::cout << "When mapping ends, do you wish to display map report on Ubuntu terminal? (Y/N): ";
         std::cin >> displayChoice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear buffer
-        displayChoice = std::toupper(displayChoice); // Convert to uppercase
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        displayChoice = std::toupper(displayChoice);
 
-        if (displayChoice == 'Y') {
-            displayReport = true;
-            break;
-        } else if (displayChoice == 'N') {
-            displayReport = false;
+        if (displayChoice == 'Y' || displayChoice == 'N') {
+            displayReport = (displayChoice == 'Y');
             break;
         } else {
             std::cout << "Invalid input! Please enter 'Y' or 'N'.\n";
@@ -219,8 +186,7 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
     std::time_t start = std::time(nullptr);
     std::cout << "\nAutopilot Mapping STARTED! Start datetime stamp = " << startTime << "\n";
     std::cout << "\nMAPPING IN PROGRESS … PLEASE DO NOT END PROGRAM !\n";
-
-    std::this_thread::sleep_for(std::chrono::seconds(5)); // Simulated delay
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
     // Mapping ends
     std::string endTime = getCurrentTime();
@@ -233,16 +199,31 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
     int minutes = (duration % 3600) / 60;
     int seconds = duration % 60;
 
-   std::cout << "\nTotal Mapping Duration: "
-          << std::setw(2) << std::setfill('0') << hours << " hr "
-          << std::setw(2) << minutes << " min "
-          << std::setw(2) << seconds << " sec\n";
+    std::cout << "\nTotal Mapping Duration: "
+              << std::setw(2) << std::setfill('0') << hours << " hr "
+              << std::setw(2) << minutes << " min "
+              << std::setw(2) << seconds << " sec\n";
 
+    // Handle encrypted files
+    std::vector<std::string> generatedMap;
+    std::string tempFilename = inputFilename;
+    if (isEncrypted) {
+        tempFilename = "decrypted_scenario.txt";
+        std::string decryptedContent = decryptFile(inputFilename, 0x99); // Change XOR key if necessary
+        std::ofstream decryptedFile(tempFilename);
+        if (decryptedFile) {
+            decryptedFile << decryptedContent;
+            decryptedFile.close();
+        } else {
+            std::cerr << "Error: Unable to write decrypted scenario file!\n";
+            return;
+        }
+    }
 
-    // Generate a 21x11 map
-    std::vector<std::string> generatedMap = generateMap(21, 11);
-
-    // Save the report to an external file
+    // Load the map from the file
+    generatedMap = loadMapFromFile(tempFilename, 21, 11);
+    
+    // Save report
     std::ofstream reportFile(outputFilename);
     if (reportFile) {
         reportFile << "Autopilot Map Report\n";
@@ -253,48 +234,35 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
         reportFile << "End datetime stamp = " << endTime << "\n";
         reportFile << "Total Mapping Duration : " << hours << " hr " << minutes << " min " << seconds << " sec\n\n";
 
-       // Print column headers (0-20)
-		reportFile << "   "; // Align headers with row numbers
-		for (int i = 0; i < 21; i++) 
-		{
-    		reportFile << std::setw(3) << i; // Ensure proper spacing
-			}
-		reportFile << "\n";
-
-		// Print terrain grid with aligned row numbers
-		for (int i = 0; i < 11; i++) {
-    	reportFile << std::setw(2) << i << " "; // Row numbering with correct spacing
-    	for (char c : generatedMap[i]) {
-        reportFile << std::setw(3) << c; // Ensure terrain elements align with headers
-    	}
-    	reportFile << "\n";
-		}
-
+        // Print map
+        reportFile << "   ";
+        for (int i = 0; i < 21; i++) reportFile << std::setw(3) << i;
+        reportFile << "\n";
+        for (int i = 0; i < 11; i++) {
+            reportFile << std::setw(2) << i << " ";
+            for (char c : generatedMap[i]) reportFile << std::setw(3) << c;
+            reportFile << "\n";
+        }
         reportFile.close();
         std::cout << "\nMap report saved to: \033[32m" << outputFilename << "\033[0m\n";
-    } 
-    else 
-    {
+    } else {
         std::cerr << "Error: Unable to save map report!\n";
         return;
     }
 
     // Display the report if requested
     if (displayReport) {
-        std::cout << "\nDisplaying contents of \033[32m" << outputFilename << "\033[0m on \033[4mUbuntu terminal\033[0m:\n\n";
         std::ifstream inFile(outputFilename);
         if (inFile) {
             std::string line;
-            while (std::getline(inFile, line)) {
-                std::cout << line << "\n";
-            }
+            std::cout << "\nDisplaying contents of \033[32m" << outputFilename << "\033[0m on \033[4mUbuntu terminal\033[0m:\n\n";
+            while (std::getline(inFile, line)) std::cout << line << "\n";
             inFile.close();
         } else {
             std::cerr << "Error: Unable to read map report!\n";
         }
     }
 }
-
 
 // Function to start simulation
 void startSimulation(const std::string& inputMapFilename, const std::string& outputRouteFilename, const std::string& routeCriteria, const std::string& vehicleType) {
