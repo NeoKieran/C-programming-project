@@ -4,9 +4,10 @@ cd Desktop/assignment
 g++ assignmentv1.cpp GridArea.cpp -o assignmentv1.run
 
 ./assignmentv1.run
-
 //
 
+// This ver works until pg 10, trying to fix the decryption 
+// Please download additional files called GridArea.h and GridArea.cpp //
 
 #include <iostream>
 #include <fstream>
