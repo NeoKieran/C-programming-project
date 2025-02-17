@@ -1,7 +1,12 @@
-// cd Desktop/assignment
-g++ assignmentv1.cpp SatComRelay.o Terrain.o TerrainMap.o VehController.o VehData.o ConfigSettings.o ExpReport.o FileUtil.o RadarSensor.o -o assignmentv1.run
-./assignmentv1.run
 //
+cd Desktop/assignment
+
+g++ assignmentv1.cpp GridArea.cpp -o assignmentv1.run
+
+./assignmentv1.run
+
+//
+
 
 #include <iostream>
 #include <fstream>
@@ -12,9 +17,8 @@ g++ assignmentv1.cpp SatComRelay.o Terrain.o TerrainMap.o VehController.o VehDat
 #include <cstdlib>
 #include <iomanip>
 #include <vector>
-#include "SatComRelay.h"
-#include "FileUtil.h"  
-#include "ConfigSettings.h"  
+#include "GridArea.h" 
+
 
 
 // Function prototypes
@@ -138,7 +142,6 @@ void configureSimulatorSettings(std::string& inputMapFilename, std::string& outp
         }
     } while (choice != 'e');
 }
-
 // Function to get current time in DD/MM/YY HH:MM:SS format
 std::string getCurrentTime() {
     std::time_t now = std::time(nullptr);
@@ -153,31 +156,79 @@ std::string getCurrentTime() {
     return oss.str();
 }
 
-// Start Autopilot Mapping Function
+
+// Function to decrypt file contents (XOR decryption with key 0x55)
+std::vector<unsigned char> decryptFileContents(const std::vector<unsigned char>& encryptedData) {
+    std::vector<unsigned char> decryptedData = encryptedData;
+
+    for (size_t i = 0; i < decryptedData.size(); i++) {
+        decryptedData[i] ^= 0x55;  // XOR each byte with 0x55
+    }
+
+    return decryptedData;
+}
+
+// Function to read and decode the terrain from Scenario06.dat
+std::vector<std::string> readTerrainFromFile(const std::string& filename, bool isEncrypted) {
+    std::vector<std::string> terrainMap;
+    std::ifstream file(filename, std::ios::binary);
+
+    if (!file) {
+        std::cerr << "Error: Unable to open " << filename << "!\n";
+        return terrainMap;
+    }
+
+    // Read file data into a vector
+    std::vector<unsigned char> fileData((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    file.close();
+
+    // 🔹 **Decrypt the file if needed**
+    if (isEncrypted) {
+        fileData = decryptFileContents(fileData);
+    }
+
+    // 🔹 **Define expected terrain grid dimensions**
+    const int width = 21;
+    const int height = 11;
+
+    // 🔹 **Ensure the file has enough data**
+    if (fileData.size() < width * height) {
+        std::cerr << "Error: File size is too small to contain a full terrain map!\n";
+        return terrainMap;
+    }
+
+    // 🔹 **Convert binary data into terrain symbols using `GridArea`**
+    for (int i = 0; i < height; i++) {
+        std::string row;
+        for (int j = 0; j < width; j++) {
+            // Convert each character from encrypted data
+            TERRAIN_TYPE terrainType = GridArea::convertCharToTerrainType(fileData[i * width + j]);
+            
+            // Use the first letter of the terrain type for output
+            row += GridArea(j, i, terrainType).convertTerrainToString()[0];
+        }
+        terrainMap.push_back(row);
+    }
+
+    return terrainMap;
+}
+
+
 void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, const std::string& outputFilename) {
     std::cout << "\n[ Start Autopilot Mapping ]\n";
     std::cout << "INPUT scenario file name    = \033[32m" << inputFilename << "\033[0m\n";
     std::cout << "INPUT scenario file encrypted = \033[32m" << (isEncrypted ? "Y" : "N") << "\033[0m\n";
     std::cout << "OUTPUT map report filename  = \033[32m" << outputFilename << "\033[0m\n\n";
 
-    // Ask if the user wants to display the report
-    char displayChoice;
-    bool displayReport = false;
-    do {
-        std::cout << "When mapping ends, do you wish to display map report on Ubuntu terminal? (Y/N): ";
-        std::cin >> displayChoice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        displayChoice = std::toupper(displayChoice);
+    // Load the map from Scenario06.dat (handling encryption)
+    std::vector<std::string> terrainMap = readTerrainFromFile(inputFilename, isEncrypted);
 
-        if (displayChoice == 'Y' || displayChoice == 'N') {
-            displayReport = (displayChoice == 'Y');
-            break;
-        } else {
-            std::cout << "Invalid input! Please enter 'Y' or 'N'.\n";
-        }
-    } while (true);
+    if (terrainMap.empty()) {
+        std::cerr << "Error: Terrain map could not be loaded!\n";
+        return;
+    }
 
-    // Confirm start
+    // Confirm start before asking to display
     char beginChoice;
     do {
         std::cout << "\nBEGIN NOW? ( Y ) : ";
@@ -186,14 +237,15 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
         beginChoice = std::toupper(beginChoice);
     } while (beginChoice != 'Y');
 
-    // Mapping starts
+    // Start mapping process
     std::string startTime = getCurrentTime();
     std::time_t start = std::time(nullptr);
     std::cout << "\nAutopilot Mapping STARTED! Start datetime stamp = " << startTime << "\n";
-    std::cout << "\nMAPPING IN PROGRESS … PLEASE DO NOT END PROGRAM !\n";
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::cout << "\nMAPPING IN PROGRESS … PLEASE DO NOT END PROGRAM!\n";
 
-    // Mapping ends
+    std::this_thread::sleep_for(std::chrono::seconds(5)); // Simulated delay
+
+    // Mapping completed
     std::string endTime = getCurrentTime();
     std::time_t end = std::time(nullptr);
     std::cout << "\nAutopilot Mapping ENDED! End datetime stamp = " << endTime << "\n";
@@ -209,26 +261,7 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
               << std::setw(2) << minutes << " min "
               << std::setw(2) << seconds << " sec\n";
 
-    // Handle encrypted files
-    std::vector<std::string> generatedMap;
-    std::string tempFilename = inputFilename;
-    if (isEncrypted) {
-        tempFilename = "decrypted_scenario.txt";
-        std::string decryptedContent = decryptFile(inputFilename, 0x99); // Change XOR key if necessary
-        std::ofstream decryptedFile(tempFilename);
-        if (decryptedFile) {
-            decryptedFile << decryptedContent;
-            decryptedFile.close();
-        } else {
-            std::cerr << "Error: Unable to write decrypted scenario file!\n";
-            return;
-        }
-    }
-
-    // Load the map from the file
-    generatedMap = loadMapFromFile(tempFilename, 21, 11);
-    
-    // Save report
+    // Save the terrain map report to a file
     std::ofstream reportFile(outputFilename);
     if (reportFile) {
         reportFile << "Autopilot Map Report\n";
@@ -239,15 +272,22 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
         reportFile << "End datetime stamp = " << endTime << "\n";
         reportFile << "Total Mapping Duration : " << hours << " hr " << minutes << " min " << seconds << " sec\n\n";
 
-        // Print map
-        reportFile << "   ";
-        for (int i = 0; i < 21; i++) reportFile << std::setw(3) << i;
+        //Print column headers (0-20)
+        reportFile << "   "; // Align headers with row numbers
+        for (int i = 0; i < 21; i++) {
+            reportFile << std::setw(3) << i;
+        }
         reportFile << "\n";
-        for (int i = 0; i < 11; i++) {
-            reportFile << std::setw(2) << i << " ";
-            for (char c : generatedMap[i]) reportFile << std::setw(3) << c;
+
+        //Print terrain grid with aligned row numbers
+        for (size_t i = 0; i < terrainMap.size(); i++) {
+            reportFile << std::setw(2) << i << " "; // Row numbering
+            for (char c : terrainMap[i]) {
+                reportFile << std::setw(3) << c; // Proper alignment
+            }
             reportFile << "\n";
         }
+
         reportFile.close();
         std::cout << "\nMap report saved to: \033[32m" << outputFilename << "\033[0m\n";
     } else {
@@ -255,13 +295,36 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
         return;
     }
 
-    // Display the report if requested
+    //Ask if the user wants to display the report AFTER processing is complete
+    char displayChoice;
+    bool displayReport = false;
+
+    do {
+        std::cout << "Do you wish to display the map report on Ubuntu terminal? (Y/N): ";
+        std::cin >> displayChoice;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        displayChoice = std::toupper(displayChoice);
+
+        if (displayChoice == 'Y') {
+            displayReport = true;
+            break;
+        } else if (displayChoice == 'N') {
+            displayReport = false;
+            break;
+        } else {
+            std::cout << "Invalid input! Please enter 'Y' or 'N'.\n";
+        }
+    } while (true);
+
+    //Display the report if requested
     if (displayReport) {
+        std::cout << "\nDisplaying contents of \033[32m" << outputFilename << "\033[0m:\n\n";
         std::ifstream inFile(outputFilename);
         if (inFile) {
             std::string line;
-            std::cout << "\nDisplaying contents of \033[32m" << outputFilename << "\033[0m on \033[4mUbuntu terminal\033[0m:\n\n";
-            while (std::getline(inFile, line)) std::cout << line << "\n";
+            while (std::getline(inFile, line)) {
+                std::cout << line << "\n";
+            }
             inFile.close();
         } else {
             std::cerr << "Error: Unable to read map report!\n";
