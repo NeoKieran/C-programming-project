@@ -1,3 +1,8 @@
+// cd Desktop/assignment
+g++ assignmentv1.cpp SatComRelay.o Terrain.o TerrainMap.o VehController.o VehData.o ConfigSettings.o ExpReport.o FileUtil.o RadarSensor.o -o assignmentv1.run
+./assignmentv1.run
+//
+
 #include <iostream>
 #include <fstream>
 #include <string>
