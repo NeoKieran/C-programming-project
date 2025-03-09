@@ -9,6 +9,7 @@ g++ assignmentv1.cpp GridArea.cpp -o assignmentv1.run
 // This ver works until pg 10, trying to fix the decryption 
 // Please download additional files called GridArea.h and GridArea.cpp //
 
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -20,80 +21,81 @@ g++ assignmentv1.cpp GridArea.cpp -o assignmentv1.run
 #include <vector>
 #include "GridArea.h" 
 
-
+using namespace std;
 
 // Function prototypes
-void configureAutopilotSettings(std::string& inputFilename, bool& isEncrypted, std::string& outputFilename);
-void configureSimulatorSettings(std::string& inputMapFilename, std::string& outputRouteFilename, std::string& routeCriteria, std::string& vehicleType);
-void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, const std::string& outputFilename);
+void configureAutopilotSettings(string& inputFilename, bool& isEncrypted, string& outputFilename);
+void configureSimulatorSettings(string& inputMapFilename, string& outputRouteFilename, string& routeCriteria, string& vehicleType);
+void startAutopilotMapping(const string& inputFilename, bool isEncrypted, const string& outputFilename);
 
 // Function to display the main menu
-void displayMainMenu(int teamNumber, const std::string& teamLeaderName) {
-    std::cout << "\n\033[1mTeam Number\033[0m        : " << teamNumber << "\n";
-    std::cout << "\033[1mTeam Leader Name\033[0m   : " << teamLeaderName << "\n";
-    std::cout << "------------------------------------------\n\n";
-    std::cout << "Welcome to Team " << teamNumber << " Group Project\n\n";
-    std::cout << "1) Configure Autopilot Mapping Exploration settings\n";
-    std::cout << "2) Configure Terrain Exploration Simulator settings\n";
-    std::cout << "3) Start Autopilot Mapping!\n";
-    std::cout << "4) Start Simulation!\n";
-    std::cout << "5) End\n\n";
-    std::cout << "Please enter your choice: ";
+void displayMainMenu(int teamNumber, const string& teamLeaderName) {
+    cout << "\n\033[1mTeam Number\033[0m        : " << teamNumber << "\n";
+    cout << "\033[1mTeam Leader Name\033[0m   : " << teamLeaderName << "\n";
+    cout << "------------------------------------------\n\n";
+    cout << "Welcome to Team " << teamNumber << " Group Project\n\n";
+    cout << "1) Configure Autopilot Mapping Exploration settings\n";
+    cout << "2) Configure Terrain Exploration Simulator settings\n";
+    cout << "3) Start Autopilot Mapping!\n";
+    cout << "4) Start Simulation!\n";
+    cout << "5) End\n\n";
+    cout << "Please enter your choice: ";
 }
 
+
 // Function to configure simulator settings
-void configureSimulatorSettings(std::string& inputMapFilename, std::string& outputRouteFilename, std::string& routeCriteria, std::string& vehicleType) {
+void configureSimulatorSettings(string& inputMapFilename, string& outputRouteFilename, string& routeCriteria, string& vehicleType) {
     char choice;
     do {
-        std::cout << "\n[ Configure Terrain Exploration Simulator settings ]\n";
-        std::cout << "    a) Specify INPUT map details filename (current: \033[32m" << inputMapFilename << "\033[0m)\n";
-        std::cout << "    b) Specify OUTPUT route report filename (current: \033[32m" << outputRouteFilename << "\033[0m)\n";
-        std::cout << "    c) Specify ideal route criteria (current: \033[32m" << routeCriteria << "\033[0m)\n";
-        std::cout << "    d) Specify vehicle type (current: \033[32m" << vehicleType << "\033[0m)\n";
-        std::cout << "    e) Back to main menu\n\n";
+        cout << "\n[ Configure Terrain Exploration Simulator settings ]\n";
+        cout << "    a) Specify INPUT map details filename (current: \033[32m" << inputMapFilename << "\033[0m)\n";
+        cout << "    b) Specify OUTPUT route report filename (current: \033[32m" << outputRouteFilename << "\033[0m)\n";
+        cout << "    c) Specify ideal route criteria (current: \033[32m" << routeCriteria << "\033[0m)\n";
+        cout << "    d) Specify vehicle type (current: \033[32m" << vehicleType << "\033[0m)\n";
+        cout << "    e) Back to main menu\n\n";
 
-        std::cout << "Please enter your choice (a - e): ";
-        std::cin >> choice;
-        std::cin.ignore();
+        cout << "Please enter your choice (a - e): ";
+        cin >> choice;
+        cin.ignore();
 
         switch (choice) {
             case 'a': {
-                std::cout << "\nPlease enter INPUT map details filename: ";
-                std::getline(std::cin, inputMapFilename);
-                std::cout << "INPUT map details filename successfully set to '\033[31m" << inputMapFilename << "\033[0m'!\n";
+                cout << "\nPlease enter INPUT map details filename: ";
+                getline(cin, inputMapFilename);
+                cout << "INPUT map details filename successfully set to '\033[31m" << inputMapFilename << "\033[0m'!\n";
                 break;
             }
             case 'b': {
-                std::cout << "\nPlease enter OUTPUT route report filename: ";
-                std::getline(std::cin, outputRouteFilename);
-                std::cout << "OUTPUT route report filename successfully set to '\033[31m" << outputRouteFilename << "\033[0m'!\n";
+                cout << "\nPlease enter OUTPUT route report filename: ";
+                getline(cin, outputRouteFilename);
+                cout << "OUTPUT route report filename successfully set to '\033[31m" << outputRouteFilename << "\033[0m'!\n";
                 break;
             }
           case 'c': { 
                 char criteriaChoice;
                 do {
-                    std::cout << "\n[ Specify Ideal Route Criteria (current: \033[32m" << routeCriteria << "\033[0m) ]\n";
-                    std::cout << "    a) Minimized total energy expenditure\n";
-                    std::cout << "    b) Shortest distance from Start to End locations\n";
-                    std::cout << "    c) Go back to sub menu\n\n";
-                    std::cout << "Enter your choice (a - c): ";
-                    std::cin >> criteriaChoice;
-                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    cout << "\n[ Specify Ideal Route Criteria (current: \033[32m" << routeCriteria << "\033[0m) ]\n";
+                    cout << "    a) Minimized total energy expenditure\n";
+                    cout << "    b) Shortest distance from Start to End locations\n";
+                    cout << "    c) Go back to sub menu\n\n";
+                    cout << "Enter your choice (a - c): ";
+                    cin >> criteriaChoice;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
                     switch (criteriaChoice) {
                         case 'a':
                             routeCriteria = "minimized total energy expenditure";
-                            std::cout << "Ideal Route Criteria successfully set to '\033[32m" << routeCriteria << "\033[0m'!\n";
+                            cout << "Ideal Route Criteria successfully set to '\033[32m" << routeCriteria << "\033[0m'!\n";
                             break;
                         case 'b':
                             routeCriteria = "shortest distance from Start to End locations";
-                            std::cout << "Ideal Route Criteria successfully set to '\033[32m" << routeCriteria << "\033[0m'!\n";
+                            cout << "Ideal Route Criteria successfully set to '\033[32m" << routeCriteria << "\033[0m'!\n";
                             break;
                         case 'c':
-                            std::cout << "Going back to sub menu...\n";
+                            cout << "Going back to sub menu...\n";
                             break;
                         default:
-                            std::cout << "Invalid choice! Please try again.\n";
+                            cout << "Invalid choice! Please try again.\n";
                             break;
                     }
                 } while (criteriaChoice != 'c'); 
@@ -102,65 +104,65 @@ void configureSimulatorSettings(std::string& inputMapFilename, std::string& outp
             case 'd': {
                 char vehicleChoice;
                 do {
-                    std::cout << "\n[ Specify Vehicle Type (current: \033[32m" << vehicleType << "\033[0m) ]\n";
-                    std::cout << "    a) HighLander (Hill h, Mountain M)\n";
-                    std::cout << "    b) DragonFly (Swamp w, Watery ~)\n";
-                    std::cout << "    c) ShieldHero (Danger area X)\n";
-                    std::cout << "    d) Go back to sub menu\n\n";
-                    std::cout << "Enter your choice (a - d): ";
-                    std::cin >> vehicleChoice;
-                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    cout << "\n[ Specify Vehicle Type (current: \033[32m" << vehicleType << "\033[0m) ]\n";
+                    cout << "    a) HighLander (Hill h, Mountain M)\n";
+                    cout << "    b) DragonFly (Swamp w, Watery ~)\n";
+                    cout << "    c) ShieldHero (Danger area X)\n";
+                    cout << "    d) Go back to sub menu\n\n";
+                    cout << "Enter your choice (a - d): ";
+                    cin >> vehicleChoice;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
                     switch (vehicleChoice) {
                         case 'a':
                             vehicleType = "HighLander";
-                            std::cout << "Vehicle Type successfully set to '\033[32m" << vehicleType << "\033[0m'!\n";
+                            cout << "Vehicle Type successfully set to '\033[32m" << vehicleType << "\033[0m'!\n";
                             break;
                         case 'b':
                             vehicleType = "DragonFly";
-                            std::cout << "Vehicle Type successfully set to '\033[32m" << vehicleType << "\033[0m'!\n";
+                            cout << "Vehicle Type successfully set to '\033[32m" << vehicleType << "\033[0m'!\n";
                             break;
                         case 'c':
                             vehicleType = "ShieldHero";
-                            std::cout << "Vehicle Type successfully set to '\033[32m" << vehicleType << "\033[0m'!\n";
+                            cout << "Vehicle Type successfully set to '\033[32m" << vehicleType << "\033[0m'!\n";
                             break;
                         case 'd':
-                            std::cout << "Going back to sub menu...\n";
+                            cout << "Going back to sub menu...\n";
                             break;
                         default:
-                            std::cout << "Invalid choice! Please try again.\n";
+                            cout << "Invalid choice! Please try again.\n";
                             break;
                     }
                 } while (vehicleChoice != 'd');
                 break;
             }
             case 'e':
-                std::cout << "Returning to main menu...\n";
+                cout << "Returning to main menu...\n";
                 break;
             default:
-                std::cout << "Invalid choice! Please enter a valid option.\n";
+                cout << "Invalid choice! Please enter a valid option.\n";
                 break;
         }
     } while (choice != 'e');
 }
+
 // Function to get current time in DD/MM/YY HH:MM:SS format
-std::string getCurrentTime() {
-    std::time_t now = std::time(nullptr);
-    std::tm* localTime = std::localtime(&now);
-    std::ostringstream oss;
-    oss << std::setfill('0') << std::setw(2) << localTime->tm_mday << "/"
-        << std::setw(2) << (localTime->tm_mon + 1) << "/"
+string getCurrentTime() {
+    time_t now = time(nullptr);
+    tm* localTime = localtime(&now);
+    ostringstream oss;
+    oss << setfill('0') << setw(2) << localTime->tm_mday << "/"
+        << setw(2) << (localTime->tm_mon + 1) << "/"
         << (localTime->tm_year % 100) << " "
-        << std::setw(2) << localTime->tm_hour << ":"
-        << std::setw(2) << localTime->tm_min << ":"
-        << std::setw(2) << localTime->tm_sec;
+        << setw(2) << localTime->tm_hour << ":"
+        << setw(2) << localTime->tm_min << ":"
+        << setw(2) << localTime->tm_sec;
     return oss.str();
 }
 
-
 // Function to decrypt file contents (XOR decryption with key 0x55)
-std::vector<unsigned char> decryptFileContents(const std::vector<unsigned char>& encryptedData) {
-    std::vector<unsigned char> decryptedData = encryptedData;
+vector<unsigned char> decryptFileContents(const vector<unsigned char>& encryptedData) {
+    vector<unsigned char> decryptedData = encryptedData;
 
     for (size_t i = 0; i < decryptedData.size(); i++) {
         decryptedData[i] ^= 0x55;  // XOR each byte with 0x55
@@ -170,17 +172,17 @@ std::vector<unsigned char> decryptFileContents(const std::vector<unsigned char>&
 }
 
 // Function to read and decode the terrain from Scenario06.dat
-std::vector<std::string> readTerrainFromFile(const std::string& filename, bool isEncrypted) {
-    std::vector<std::string> terrainMap;
-    std::ifstream file(filename, std::ios::binary);
+vector<string> readTerrainFromFile(const string& filename, bool isEncrypted) {
+    vector<string> terrainMap;
+    ifstream file(filename, ios::binary);
 
     if (!file) {
-        std::cerr << "Error: Unable to open " << filename << "!\n";
+        cerr << "Error: Unable to open " << filename << "!\n";
         return terrainMap;
     }
 
     // Read file data into a vector
-    std::vector<unsigned char> fileData((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    vector<unsigned char> fileData((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
     file.close();
 
     // 🔹 **Decrypt the file if needed**
@@ -194,13 +196,13 @@ std::vector<std::string> readTerrainFromFile(const std::string& filename, bool i
 
     // 🔹 **Ensure the file has enough data**
     if (fileData.size() < width * height) {
-        std::cerr << "Error: File size is too small to contain a full terrain map!\n";
+        cerr << "Error: File size is too small to contain a full terrain map!\n";
         return terrainMap;
     }
 
     // 🔹 **Convert binary data into terrain symbols using `GridArea`**
     for (int i = 0; i < height; i++) {
-        std::string row;
+        string row;
         for (int j = 0; j < width; j++) {
             // Convert each character from encrypted data
             TERRAIN_TYPE terrainType = GridArea::convertCharToTerrainType(fileData[i * width + j]);
@@ -214,42 +216,41 @@ std::vector<std::string> readTerrainFromFile(const std::string& filename, bool i
     return terrainMap;
 }
 
-
-void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, const std::string& outputFilename) {
-    std::cout << "\n[ Start Autopilot Mapping ]\n";
-    std::cout << "INPUT scenario file name    = \033[32m" << inputFilename << "\033[0m\n";
-    std::cout << "INPUT scenario file encrypted = \033[32m" << (isEncrypted ? "Y" : "N") << "\033[0m\n";
-    std::cout << "OUTPUT map report filename  = \033[32m" << outputFilename << "\033[0m\n\n";
+void startAutopilotMapping(const string& inputFilename, bool isEncrypted, const string& outputFilename) {
+    cout << "\n[ Start Autopilot Mapping ]\n";
+    cout << "INPUT scenario file name    = \033[32m" << inputFilename << "\033[0m\n";
+    cout << "INPUT scenario file encrypted = \033[32m" << (isEncrypted ? "Y" : "N") << "\033[0m\n";
+    cout << "OUTPUT map report filename  = \033[32m" << outputFilename << "\033[0m\n\n";
 
     // Load the map from Scenario06.dat (handling encryption)
-    std::vector<std::string> terrainMap = readTerrainFromFile(inputFilename, isEncrypted);
+    vector<string> terrainMap = readTerrainFromFile(inputFilename, isEncrypted);
 
     if (terrainMap.empty()) {
-        std::cerr << "Error: Terrain map could not be loaded!\n";
+        cerr << "Error: Terrain map could not be loaded!\n";
         return;
     }
 
     // Confirm start before asking to display
     char beginChoice;
     do {
-        std::cout << "\nBEGIN NOW? ( Y ) : ";
-        std::cin >> beginChoice;
-        std::cin.ignore();
-        beginChoice = std::toupper(beginChoice);
+        cout << "\nBEGIN NOW? ( Y ) : ";
+        cin >> beginChoice;
+        cin.ignore();
+        beginChoice = toupper(beginChoice);
     } while (beginChoice != 'Y');
 
     // Start mapping process
-    std::string startTime = getCurrentTime();
-    std::time_t start = std::time(nullptr);
-    std::cout << "\nAutopilot Mapping STARTED! Start datetime stamp = " << startTime << "\n";
-    std::cout << "\nMAPPING IN PROGRESS … PLEASE DO NOT END PROGRAM!\n";
+    string startTime = getCurrentTime();
+    time_t start = time(nullptr);
+    cout << "\nAutopilot Mapping STARTED! Start datetime stamp = " << startTime << "\n";
+    cout << "\nMAPPING IN PROGRESS … PLEASE DO NOT END PROGRAM!\n";
 
-    std::this_thread::sleep_for(std::chrono::seconds(5)); // Simulated delay
+    this_thread::sleep_for(chrono::seconds(5)); // Simulated delay
 
     // Mapping completed
-    std::string endTime = getCurrentTime();
-    std::time_t end = std::time(nullptr);
-    std::cout << "\nAutopilot Mapping ENDED! End datetime stamp = " << endTime << "\n";
+    string endTime = getCurrentTime();
+    time_t end = time(nullptr);
+    cout << "\nAutopilot Mapping ENDED! End datetime stamp = " << endTime << "\n";
 
     // Calculate mapping duration
     int duration = static_cast<int>(difftime(end, start));
@@ -257,13 +258,13 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
     int minutes = (duration % 3600) / 60;
     int seconds = duration % 60;
 
-    std::cout << "\nTotal Mapping Duration: "
-              << std::setw(2) << std::setfill('0') << hours << " hr "
-              << std::setw(2) << minutes << " min "
-              << std::setw(2) << seconds << " sec\n";
+    cout << "\nTotal Mapping Duration: "
+              << setw(2) << setfill('0') << hours << " hr "
+              << setw(2) << minutes << " min "
+              << setw(2) << seconds << " sec\n";
 
     // Save the terrain map report to a file
-    std::ofstream reportFile(outputFilename);
+    ofstream reportFile(outputFilename);
     if (reportFile) {
         reportFile << "Autopilot Map Report\n";
         reportFile << "INPUT scenario file name    = " << inputFilename << "\n";
@@ -276,23 +277,23 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
         //Print column headers (0-20)
         reportFile << "   "; // Align headers with row numbers
         for (int i = 0; i < 21; i++) {
-            reportFile << std::setw(3) << i;
+            reportFile << setw(3) << i;
         }
         reportFile << "\n";
 
         //Print terrain grid with aligned row numbers
         for (size_t i = 0; i < terrainMap.size(); i++) {
-            reportFile << std::setw(2) << i << " "; // Row numbering
+            reportFile << setw(2) << i << " "; // Row numbering
             for (char c : terrainMap[i]) {
-                reportFile << std::setw(3) << c; // Proper alignment
+                reportFile << setw(3) << c; // Proper alignment
             }
             reportFile << "\n";
         }
 
         reportFile.close();
-        std::cout << "\nMap report saved to: \033[32m" << outputFilename << "\033[0m\n";
+        cout << "\nMap report saved to: \033[32m" << outputFilename << "\033[0m\n";
     } else {
-        std::cerr << "Error: Unable to save map report!\n";
+        cerr << "Error: Unable to save map report!\n";
         return;
     }
 
@@ -301,10 +302,10 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
     bool displayReport = false;
 
     do {
-        std::cout << "Do you wish to display the map report on Ubuntu terminal? (Y/N): ";
-        std::cin >> displayChoice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        displayChoice = std::toupper(displayChoice);
+        cout << "Do you wish to display the map report on Ubuntu terminal? (Y/N): ";
+        cin >> displayChoice;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        displayChoice = toupper(displayChoice);
 
         if (displayChoice == 'Y') {
             displayReport = true;
@@ -313,73 +314,72 @@ void startAutopilotMapping(const std::string& inputFilename, bool isEncrypted, c
             displayReport = false;
             break;
         } else {
-            std::cout << "Invalid input! Please enter 'Y' or 'N'.\n";
+            cout << "Invalid input! Please enter 'Y' or 'N'.\n";
         }
     } while (true);
 
     //Display the report if requested
     if (displayReport) {
-        std::cout << "\nDisplaying contents of \033[32m" << outputFilename << "\033[0m:\n\n";
-        std::ifstream inFile(outputFilename);
+        cout << "\nDisplaying contents of \033[32m" << outputFilename << "\033[0m:\n\n";
+        ifstream inFile(outputFilename);
         if (inFile) {
-            std::string line;
-            while (std::getline(inFile, line)) {
-                std::cout << line << "\n";
+            string line;
+            while (getline(inFile, line)) {
+                cout << line << "\n";
             }
             inFile.close();
         } else {
-            std::cerr << "Error: Unable to read map report!\n";
+            cerr << "Error: Unable to read map report!\n";
         }
     }
 }
-
 // Function to start simulation
-void startSimulation(const std::string& inputMapFilename, const std::string& outputRouteFilename, const std::string& routeCriteria, const std::string& vehicleType) {
-    std::cout << "\n[ Start Simulation ]\n";
-    std::cout << "INPUT map details filename    = \033[32m" << inputMapFilename << "\033[0m\n";
-    std::cout << "OUTPUT route report filename  = \033[32m" << outputRouteFilename << "\033[0m\n";
-    std::cout << "Ideal Route Criteria          = \033[32m" << routeCriteria << "\033[0m\n";
-    std::cout << "Vehicle Type                  = \033[32m" << vehicleType << "\033[0m\n\n";
+void startSimulation(const string& inputMapFilename, const string& outputRouteFilename, const string& routeCriteria, const string& vehicleType) {
+    cout << "\n[ Start Simulation ]\n";
+    cout << "INPUT map details filename    = \033[32m" << inputMapFilename << "\033[0m\n";
+    cout << "OUTPUT route report filename  = \033[32m" << outputRouteFilename << "\033[0m\n";
+    cout << "Ideal Route Criteria          = \033[32m" << routeCriteria << "\033[0m\n";
+    cout << "Vehicle Type                  = \033[32m" << vehicleType << "\033[0m\n\n";
 
     // Ask if the user wants to display the report
     char displayChoice;
-    std::cout << "When simulation ends, do you wish to display route report on Ubuntu terminal? (Y/N): ";
-    std::cin >> displayChoice;
-    std::cin.ignore();
+    cout << "When simulation ends, do you wish to display route report on Ubuntu terminal? (Y/N): ";
+    cin >> displayChoice;
+    cin.ignore();
     bool displayReport = (displayChoice == 'Y' || displayChoice == 'y');
 
-    std::cout << "\nBEGIN NOW? ( Y ) : ";
+    cout << "\nBEGIN NOW? ( Y ) : ";
     char beginChoice;
-    std::cin >> beginChoice;
-    std::cin.ignore();
+    cin >> beginChoice;
+    cin.ignore();
 
     if (beginChoice != 'Y' && beginChoice != 'y') {
-        std::cout << "Simulation process aborted.\n";
+        cout << "Simulation process aborted.\n";
         return;
     }
 
-    std::string startTime = getCurrentTime();
-    std::time_t start = std::time(nullptr);
-    std::cout << "\nRoute Simulation STARTED! Start datetime stamp = " << startTime << "\n";
-    std::cout << "\n" << std::setw(7) << " " << "SIMULATION IN PROGRESS … PLEASE DO NOT END PROGRAM !\n";
+    string startTime = getCurrentTime();
+    time_t start = time(nullptr);
+    cout << "\nRoute Simulation STARTED! Start datetime stamp = " << startTime << "\n";
+    cout << "\n" << setw(7) << " " << "SIMULATION IN PROGRESS … PLEASE DO NOT END PROGRAM !\n";
   
     
-    std::this_thread::sleep_for(std::chrono::seconds(5)); // Simulated delay
+    this_thread::sleep_for(chrono::seconds(5)); // Simulated delay
 
-    std::string endTime = getCurrentTime();
-    std::time_t end = std::time(nullptr);
-    std::cout << "\nRoute Simulation ENDED! End datetime stamp = " << endTime << "\n";
+    string endTime = getCurrentTime();
+    time_t end = time(nullptr);
+    cout << "\nRoute Simulation ENDED! End datetime stamp = " << endTime << "\n";
     
     int duration = static_cast<int>(difftime(end, start));
     int hours = duration / 3600;
     int minutes = (duration % 3600) / 60;
     int seconds = duration % 60;
     
-    std::cout << "\nTotal Simulation Duration : " << std::setw(2) << std::setfill('0') << hours << " hr "
-              << std::setw(2) << minutes << " min "
-              << std::setw(2) << seconds << " sec\n";
+    cout << "\nTotal Simulation Duration : " << setw(2) << setfill('0') << hours << " hr "
+              << setw(2) << minutes << " min "
+              << setw(2) << seconds << " sec\n";
 
-    std::ofstream reportFile(outputRouteFilename);
+    ofstream reportFile(outputRouteFilename);
     if (reportFile) {
         reportFile << "Route Simulation Report\n";
         reportFile << "Start Time: " << startTime << "\n";
@@ -388,90 +388,90 @@ void startSimulation(const std::string& inputMapFilename, const std::string& out
         reportFile << "Input Map Used: " << inputMapFilename << "\n";
         reportFile << "Vehicle Type: " << vehicleType << "\n";
         reportFile.close();
-        std::cout << "\nRoute report saved to: \033[32m" << outputRouteFilename << "\033[0m\n";
+        cout << "\nRoute report saved to: \033[32m" << outputRouteFilename << "\033[0m\n";
     } else {
-        std::cerr << "Error: Unable to save route report!\n";
+        cerr << "Error: Unable to save route report!\n";
         return;
     }
 
     // Display the report if the user requested it
     if (displayReport) {
-        std::cout << "\nDisplaying contents of " << outputRouteFilename << " on Ubuntu terminal:\n\n";
-        std::ifstream inFile(outputRouteFilename);
+        cout << "\nDisplaying contents of " << outputRouteFilename << " on Ubuntu terminal:\n\n";
+        ifstream inFile(outputRouteFilename);
         if (inFile) {
-            std::string line;
-            while (std::getline(inFile, line)) {
-                std::cout << line << "\n";
+            string line;
+            while (getline(inFile, line)) {
+                cout << line << "\n";
             }
             inFile.close();
         } else {
-            std::cerr << "Error: Unable to read route report!\n";
+            cerr << "Error: Unable to read route report!\n";
         }
     }
 }
 
 // Function to configure autopilot settings
-void configureAutopilotSettings(std::string& inputFilename, bool& isEncrypted, std::string& outputFilename) {
+void configureAutopilotSettings(string& inputFilename, bool& isEncrypted, string& outputFilename) {
     char choice;
     do {
-        std::cout << "\n[ Configure Autopilot Mapping Exploration settings ]\n";
-        std::cout << "    a) Specify INPUT scenario filename (current: \033[32m" << inputFilename << "\033[0m)\n";
-        std::cout << "    b) Specify INPUT scenario file encrypted (current: \033[32m" << (isEncrypted ? "Y" : "N") << "\033[0m)\n";
-        std::cout << "    c) Specify OUTPUT map report filename (current: \033[32m" << outputFilename << "\033[0m)\n";
-        std::cout << "    d) Back to main menu\n\n";
+        cout << "\n[ Configure Autopilot Mapping Exploration settings ]\n";
+        cout << "    a) Specify INPUT scenario filename (current: \033[32m" << inputFilename << "\033[0m)\n";
+        cout << "    b) Specify INPUT scenario file encrypted (current: \033[32m" << (isEncrypted ? "Y" : "N") << "\033[0m)\n";
+        cout << "    c) Specify OUTPUT map report filename (current: \033[32m" << outputFilename << "\033[0m)\n";
+        cout << "    d) Back to main menu\n\n";
 
-        std::cout << "Please enter your choice (a - d): ";
-        std::cin >> choice;
-        std::cin.ignore();
+        cout << "Please enter your choice (a - d): ";
+        cin >> choice;
+        cin.ignore();
 
         switch (choice) {
             case 'a': {
-                std::cout << "\nPlease enter INPUT scenario filename: ";
-                std::getline(std::cin, inputFilename);
-                std::cout << "\nINPUT scenario filename successfully set to '\033[31m" << inputFilename << "\033[0m'!\n";
+                cout << "\nPlease enter INPUT scenario filename: ";
+                getline(cin, inputFilename);
+                cout << "\nINPUT scenario filename successfully set to '\033[31m" << inputFilename << "\033[0m'!\n";
                 break;
             }
             case 'b': {
                 char encryptChoice;
-                std::cout << "Is the INPUT scenario file encrypted? (Y/N): ";
-                std::cin >> encryptChoice;
-                std::cin.ignore();
+                cout << "Is the INPUT scenario file encrypted? (Y/N): ";
+                cin >> encryptChoice;
+                cin.ignore();
                 isEncrypted = (encryptChoice == 'Y' || encryptChoice == 'y');
-                std::cout << "INPUT scenario file encryption set to '\033[31m" << (isEncrypted ? "Y" : "N") << "\033[0m'!\n";
+                cout << "INPUT scenario file encryption set to '\033[31m" << (isEncrypted ? "Y" : "N") << "\033[0m'!\n";
                 break;
             }
             case 'c': {
-                std::cout << "Please enter OUTPUT map report filename: ";
-                std::getline(std::cin, outputFilename);
-                std::cout << "\nOUTPUT map report filename successfully set to '\033[31m" << outputFilename << "\033[0m'!\n";
+                cout << "Please enter OUTPUT map report filename: ";
+                getline(cin, outputFilename);
+                cout << "\nOUTPUT map report filename successfully set to '\033[31m" << outputFilename << "\033[0m'!\n";
                 break;
             }
             case 'd':
-                std::cout << "Returning to main menu...\n";
+                cout << "Returning to main menu...\n";
                 break;
             default:
-                std::cout << "Invalid choice! Please try again.\n";
+                cout << "Invalid choice! Please try again.\n";
                 break;
         }
     } while (choice != 'd');
 }
 
 int main() {
-    std::string inputFilename = "default.dat";
+    string inputFilename = "default.dat";
     bool isEncrypted = true;
-    std::string outputFilename = "map-rpt.txt";
+    string outputFilename = "map-rpt.txt";
 
-    std::string inputMapFilename = "map-rpt.txt";
-    std::string outputRouteFilename = "route-rpt.txt";
-    std::string routeCriteria = "Minimized total energy expenditure";
-    std::string vehicleType = "HighLander";
+    string inputMapFilename = "map-rpt.txt";
+    string outputRouteFilename = "route-rpt.txt";
+    string routeCriteria = "Minimized total energy expenditure";
+    string vehicleType = "HighLander";
 
     int choice;
     do {
         displayMainMenu(1, "Alexandre Cotton");
         
-        std::cin >> choice;
-        std::cin.ignore();
+        cin >> choice;
+        cin.ignore();
 
         switch (choice) {
             case 1:
@@ -487,10 +487,10 @@ int main() {
                 startSimulation(inputMapFilename, outputRouteFilename, routeCriteria, vehicleType);
                 break;
             case 5:
-                std::cout << "Exiting program...\n";
+                cout << "Exiting program...\n";
                 break;
             default:
-                std::cout << "Invalid choice! Please enter a number between 1-5.\n";
+                cout << "Invalid choice! Please enter a number between 1-5.\n";
                 break;
         }
     } while (choice != 5);
